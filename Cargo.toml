@@ -1,0 +1,8 @@
+[package]
+name = "quizinator"
+version = "0.1.0"
+authors = ["Will Kahn-Greene <willkg@mozilla.com>"]
+edition = "2018"
+
+[dependencies]
+rand = "0.6.5"
