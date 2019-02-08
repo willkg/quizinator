@@ -29,7 +29,7 @@ fn main() {
     let mut total_wrong: i32 = 0;
     let start_time = SystemTime::now();
     for problem in &problems {
-        print!("{} * {} = ", problem[0], problem[1]);
+        print!("{} * {} = ? ", problem[0], problem[1]);
         io::stdout().flush().unwrap();
         let mut guess = String::new();
         io::stdin().read_line(&mut guess).expect("Failed to read line");
@@ -37,10 +37,10 @@ fn main() {
 
         if guess_as_num == problem[0] * problem[1] {
             total_right = total_right + 1;
-            println!("Correct!");
+            println!("Correct! 😀");
         } else {
             total_wrong = total_wrong + 1;
-            println!("Sorry--that's not correct.");
+            println!("Sorry--that's not correct. 🤮");
         }
     }
     println!("Elapsed: {} seconds", start_time.elapsed().unwrap().as_secs());
