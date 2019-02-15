@@ -15,34 +15,37 @@
 //! $ quizinator 5 6 7
 //! ```
 
+extern crate structopt;
+
 use rand::thread_rng;
 use rand::seq::SliceRandom;
-use std::env;
 use std::f64;
 use std::io;
 use std::io::Write;
 use std::time::SystemTime;
+use structopt::StructOpt;
+
+
+#[derive(StructOpt, Debug)]
+#[structopt(about = "Quizzes you on multiplication facts.")]
+struct Cli {
+    #[structopt(multiple = true, required = false, help = "number")]
+    lhs: Vec<i32>,
+}
 
 
 fn main() {
     // the lhs and rhs possibilities
     let rhs_numbers = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+    let opt = Cli::from_args();
 
     let mut lhs_numbers = Vec::new();
-
-    for arg in env::args() {
-        match arg.trim().parse() {
-            Result::Ok(val) =>
-                lhs_numbers.push(val),
-            Result::Err(_e) =>
-                println!("I don't understand \"{}\".", arg),
-        }
-    }
-
-    if lhs_numbers.len() == 0 {
+    if opt.lhs.len() == 0 {
         println!("No numbers specified. Adding 1 and 2.");
         lhs_numbers.push(1);
         lhs_numbers.push(2);
+    } else {
+        lhs_numbers.extend(opt.lhs);
     }
 
     println!("Using {:?}.", lhs_numbers);
