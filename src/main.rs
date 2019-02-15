@@ -1,5 +1,6 @@
 use rand::thread_rng;
 use rand::seq::SliceRandom;
+use std::env;
 use std::f64;
 use std::io;
 use std::io::Write;
@@ -8,8 +9,26 @@ use std::time::SystemTime;
 
 fn main() {
     // the lhs and rhs possibilities
-    let lhs_numbers = vec![1];
     let rhs_numbers = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+
+    let mut lhs_numbers = Vec::new();
+
+    for arg in env::args() {
+        match arg.trim().parse() {
+            Result::Ok(val) =>
+                lhs_numbers.push(val),
+            Result::Err(_e) =>
+                println!("I don't understand \"{}\".", arg),
+        }
+    }
+
+    if lhs_numbers.len() == 0 {
+        println!("No numbers specified. Adding 1 and 2.");
+        lhs_numbers.push(1);
+        lhs_numbers.push(2);
+    }
+
+    println!("Using {:?}.", lhs_numbers);
 
     let mut problems = Vec::new();
 
