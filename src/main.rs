@@ -1,3 +1,20 @@
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this
+// file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+//! Quizinator
+//!
+//! This implements the quizinator script which can be used for practicing
+//! multiplication facts.
+//!
+//! # Examples
+//!
+//! ```
+//! $ quizinator
+//! $ quizinator 5
+//! $ quizinator 5 6 7
+//! ```
+
 use rand::thread_rng;
 use rand::seq::SliceRandom;
 use std::env;
