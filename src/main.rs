@@ -1,5 +1,6 @@
 use rand::thread_rng;
 use rand::seq::SliceRandom;
+use std::f64;
 use std::io;
 use std::io::Write;
 use std::time::SystemTime;
@@ -7,7 +8,7 @@ use std::time::SystemTime;
 
 fn main() {
     // the lhs and rhs possibilities
-    let lhs_numbers = vec![1, 2];
+    let lhs_numbers = vec![1];
     let rhs_numbers = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
 
     let mut problems = Vec::new();
@@ -25,8 +26,8 @@ fn main() {
 
     // now the quiz!
     println!("QUIZINATION!!!!");
-    let mut total_right: i32 = 0;
-    let mut total_wrong: i32 = 0;
+    let mut total_right: u64 = 0;
+    let mut total_wrong: u64 = 0;
     let start_time = SystemTime::now();
     for problem in &problems {
         let mut guess_as_num: i32 = -1;
@@ -55,7 +56,18 @@ fn main() {
             println!("Sorry--that's not correct. 🤮");
         }
     }
-    println!("Elapsed: {} seconds", start_time.elapsed().unwrap().as_secs());
+
+    // Print summary of quizinator session
+    let elapsed_time: u64 = start_time.elapsed().unwrap().as_secs();
+    let total_problems: u64 = total_right + total_wrong;
+    let time_per_problem: f64 = f64::from_bits(elapsed_time) / f64::from_bits(total_problems);
+
+    println!("Elapsed: {} seconds", elapsed_time);
+    println!(
+        "Total problems: {}, {:.2}s per problem",
+        total_problems,
+        time_per_problem
+    );
     println!("Total right: {}", total_right);
     println!("Total wrong: {}", total_wrong);
 }
