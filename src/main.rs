@@ -26,6 +26,7 @@ use std::time::SystemTime;
 use structopt::StructOpt;
 
 
+// Declare a Cli detailing command line arguments
 #[derive(StructOpt, Debug)]
 #[structopt(about = "Quizzes you on multiplication facts.")]
 struct Cli {
@@ -35,11 +36,10 @@ struct Cli {
 
 
 fn main() {
-    // the lhs and rhs possibilities
+    // Build lhs and rhs
     let rhs_numbers = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-    let opt = Cli::from_args();
-
     let mut lhs_numbers = Vec::new();
+    let opt = Cli::from_args();
     if opt.lhs.len() == 0 {
         println!("No numbers specified. Adding 1 and 2.");
         lhs_numbers.push(1);
@@ -47,12 +47,10 @@ fn main() {
     } else {
         lhs_numbers.extend(opt.lhs);
     }
+    println!("Using lhs = {:?}  and rhs = {:?}.", lhs_numbers, rhs_numbers);
 
-    println!("Using {:?}.", lhs_numbers);
-
+    // Generate all possible problem combinations
     let mut problems = Vec::new();
-
-    // generate all possible problem combinations
     let mut rng = thread_rng();
     for lhs_num in &lhs_numbers {
         for rhs_num in &rhs_numbers {
@@ -60,10 +58,10 @@ fn main() {
         }
     }
 
-    // now shuffle the problems
+    // Shuffle the problems
     problems.shuffle(&mut rng);
 
-    // now the quiz!
+    // Now the quiz!
     println!("QUIZINATION!!!!");
     let mut total_right: u64 = 0;
     let mut total_wrong: u64 = 0;
