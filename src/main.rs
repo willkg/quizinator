@@ -91,7 +91,9 @@ fn main() {
         } else {
             total_wrong = total_wrong + 1;
             println!("Sorry--that's not correct. 🤮");
+            println!("{} * {} = {}", problem[0], problem[1], problem[0] * problem[1]);
         }
+        println!("")
     }
 
     // Print summary of quizinator session
@@ -101,7 +103,7 @@ fn main() {
 
     println!("Elapsed: {} seconds", elapsed_time);
     println!(
-        "Total problems: {}, {:.2}s per problem",
+        "Total problems: {}, {:.3}s per problem",
         total_problems,
         time_per_problem
     );
