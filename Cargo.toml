@@ -5,5 +5,5 @@ authors = ["Will Kahn-Greene <willkg@mozilla.com>"]
 edition = "2018"
 
 [dependencies]
-rand = "0.6.5"
-structopt = "0.2"
+rand = "0.8.4"
+structopt = "0.3.26"
