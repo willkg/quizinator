@@ -22,16 +22,23 @@ use rand::seq::SliceRandom;
 use std::f64;
 use std::io;
 use std::io::Write;
+use std::process;
 use std::time::SystemTime;
 use structopt::StructOpt;
 
 
 // Declare a Cli detailing command line arguments
 #[derive(StructOpt, Debug)]
-#[structopt(about = "Quizzes you on multiplication facts.")]
+#[structopt(about = "Quizzes you on math facts.")]
 struct Cli {
+    #[structopt(long = "print")]
+    print_option: bool,
+
+    #[structopt(long = "operation", default_value = "a", help = "'m', 'd', 'a', or 's'")]
+    operation_option: String,
+
     #[structopt(multiple = true, required = false, help = "number")]
-    lhs: Vec<i32>,
+    lhs_option: Vec<i32>,
 }
 
 
@@ -40,12 +47,31 @@ fn main() {
     let rhs_numbers = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
     let mut lhs_numbers = Vec::new();
     let opt = Cli::from_args();
-    if opt.lhs.len() == 0 {
+
+    let print_mode = opt.print_option;
+    println!("Print mode: {:?}.", print_mode);
+
+    let operation = opt.operation_option.as_str();
+    let operation_sym;
+
+    match operation {
+        "m" => operation_sym = "*",
+        "d" => operation_sym = "/",
+        "a" => operation_sym = "+",
+        "s" => operation_sym = "-",
+        _ => {
+            println!("Unknown operation: {:?}.", operation);
+            process::exit(1);
+        },
+    }
+    println!("Using operation {:?}.", operation);
+
+    if opt.lhs_option.len() == 0 {
         println!("No numbers specified. Adding 1 and 2.");
         lhs_numbers.push(1);
         lhs_numbers.push(2);
     } else {
-        lhs_numbers.extend(opt.lhs);
+        lhs_numbers.extend(opt.lhs_option);
     }
     println!("Using lhs = {:?}  and rhs = {:?}.", lhs_numbers, rhs_numbers);
 
@@ -61,6 +87,14 @@ fn main() {
     // Shuffle the problems
     problems.shuffle(&mut rng);
 
+    // If we're in print mode, then we print them out and exit
+    if print_mode {
+        for problem in &problems {
+            println!("{} {} {} = ? ", problem[0], operation_sym, problem[1]);
+        }
+        process::exit(0);
+    }
+
     // Now the quiz!
     println!("QUIZINATION!!!!");
     let mut total_right: u64 = 0;
@@ -68,8 +102,39 @@ fn main() {
     let start_time = SystemTime::now();
     for problem in &problems {
         let mut guess_as_num: i32 = -1;
+        let lhs: i32;
+        let rhs: i32;
+        let answer: i32;
+
+        if operation == "m" {
+            lhs = problem[0];
+            rhs = problem[1];
+            answer = lhs * rhs;
+        } else if operation == "d" {
+            lhs = problem[0] * problem[1];
+            rhs = problem[1];
+            if rhs == 0 {
+                // Don't want to divide by zero--that's bad
+                continue;
+            }
+            answer = lhs / rhs;
+        } else if operation == "a" {
+            lhs = problem[0];
+            rhs = problem[1];
+            answer = lhs + rhs;
+        } else {
+            if problem[0] > problem[1] {
+                lhs = problem[0];
+                rhs = problem[1];
+            } else {
+                lhs = problem[1];
+                rhs = problem[0];
+            }
+            answer = lhs - rhs;
+        }
+
         loop {
-            print!("{} * {} = ? ", problem[0], problem[1]);
+            print!("{} {} {} = ? ", lhs, operation_sym, rhs);
             io::stdout().flush().unwrap();
             let mut guess = String::new();
             io::stdin().read_line(&mut guess).expect("Failed to read line");
@@ -85,13 +150,13 @@ fn main() {
             }
         }
 
-        if guess_as_num == problem[0] * problem[1] {
+        if guess_as_num == answer {
             total_right = total_right + 1;
             println!("Correct! 😀");
         } else {
             total_wrong = total_wrong + 1;
             println!("Sorry--that's not correct. 🤮");
-            println!("{} * {} = {}", problem[0], problem[1], problem[0] * problem[1]);
+            println!("{} {} {} = {}", lhs, operation_sym, rhs, answer);
         }
         println!("")
     }
