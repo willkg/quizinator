@@ -4,15 +4,15 @@
 
 //! Quizinator
 //!
-//! This implements the quizinator script which can be used for practicing
-//! multiplication facts.
+//! This implements the quizinator script which can be used for practicing math facts.
 //!
 //! # Examples
 //!
 //! ```
 //! $ quizinator
 //! $ quizinator 5
-//! $ quizinator 5 6 7
+//! $ quizinator --operation m 5 6 7
+//! $ quizinator --print
 //! ```
 
 extern crate structopt;
@@ -87,14 +87,6 @@ fn main() {
     // Shuffle the problems
     problems.shuffle(&mut rng);
 
-    // If we're in print mode, then we print them out and exit
-    if print_mode {
-        for problem in &problems {
-            println!("{} {} {} = ? ", problem[0], operation_sym, problem[1]);
-        }
-        process::exit(0);
-    }
-
     // Now the quiz!
     println!("QUIZINATION!!!!");
     let mut total_right: u64 = 0;
@@ -112,7 +104,7 @@ fn main() {
             answer = lhs * rhs;
         } else if operation == "d" {
             lhs = problem[0] * problem[1];
-            rhs = problem[1];
+            rhs = problem[0];
             if rhs == 0 {
                 // Don't want to divide by zero--that's bad
                 continue;
@@ -133,45 +125,53 @@ fn main() {
             answer = lhs - rhs;
         }
 
-        loop {
-            print!("{} {} {} = ? ", lhs, operation_sym, rhs);
-            io::stdout().flush().unwrap();
-            let mut guess = String::new();
-            io::stdin().read_line(&mut guess).expect("Failed to read line");
+        // If we're in print mode, then just print it
+        if print_mode {
+            println!("{} {} {} = ? ", lhs, operation_sym, rhs);
 
-            match guess.trim().parse() {
-                Result::Ok(val) =>
-                    guess_as_num = val,
-                Result::Err(_e) =>
-                    println!("I don't understand."),
-            }
-            if guess_as_num != -1 {
-                break;
-            }
-        }
+        } else{
+            loop {
+                print!("{} {} {} = ? ", lhs, operation_sym, rhs);
+                io::stdout().flush().unwrap();
+                let mut guess = String::new();
+                io::stdin().read_line(&mut guess).expect("Failed to read line");
 
-        if guess_as_num == answer {
-            total_right = total_right + 1;
-            println!("Correct! 😀");
-        } else {
-            total_wrong = total_wrong + 1;
-            println!("Sorry--that's not correct. 🤮");
-            println!("{} {} {} = {}", lhs, operation_sym, rhs, answer);
+                match guess.trim().parse() {
+                    Result::Ok(val) =>
+                        guess_as_num = val,
+                    Result::Err(_e) =>
+                        println!("I don't understand."),
+                }
+                if guess_as_num != -1 {
+                    break;
+                }
+            }
+
+            if guess_as_num == answer {
+                total_right = total_right + 1;
+                println!("Correct! 😀");
+            } else {
+                total_wrong = total_wrong + 1;
+                println!("Sorry--that's not correct. 🤮");
+                println!("{} {} {} = {}", lhs, operation_sym, rhs, answer);
+            }
+            println!("")
         }
-        println!("")
     }
 
-    // Print summary of quizinator session
-    let elapsed_time: u64 = start_time.elapsed().unwrap().as_secs();
-    let total_problems: u64 = total_right + total_wrong;
-    let time_per_problem: f64 = f64::from_bits(elapsed_time) / f64::from_bits(total_problems);
+    if !print_mode {
+        // Print summary of quizinator session
+        let elapsed_time: u64 = start_time.elapsed().unwrap().as_secs();
+        let total_problems: u64 = total_right + total_wrong;
+        let time_per_problem: f64 = f64::from_bits(elapsed_time) / f64::from_bits(total_problems);
 
-    println!("Elapsed: {} seconds", elapsed_time);
-    println!(
-        "Total problems: {}, {:.3}s per problem",
-        total_problems,
-        time_per_problem
-    );
-    println!("Total right: {}", total_right);
-    println!("Total wrong: {}", total_wrong);
+        println!("Elapsed: {} seconds", elapsed_time);
+        println!(
+            "Total problems: {}, {:.3}s per problem",
+            total_problems,
+            time_per_problem
+        );
+        println!("Total right: {}", total_right);
+        println!("Total wrong: {}", total_wrong);
+    }
 }
